@@ -3,12 +3,15 @@ import { JwtModule } from '@nestjs/jwt';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { PrismaService } from '../prisma.service';
+import * as dotenv from 'dotenv';
+
+dotenv.config();
 
 @Module({
   imports: [
     JwtModule.register({
       global: true,
-      secret: 'PvsO=[j5j@G(S!Fzki{7mVPGGxmaqe$!)|lQWKMMP1-',
+      secret: process.env.JWT_SECRET,
       signOptions: { expiresIn: '1h' }, 
     })
   ],
