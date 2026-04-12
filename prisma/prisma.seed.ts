@@ -29,7 +29,7 @@ async function main() {
       title: 'Moega Modular para Fertilizantes',
       description: 'Solução personalizada para recepção de fertilizantes granulados com sistema de despoeiramento integrado.',
       status: ProjectStatus.PLANNING,
-      imageUrl: 'https://images.unsplash.com/photo-1541933017631-030a27361732?q=80&w=800',
+      imageUrl: 'https://images.unsplash.com/photo-1580982327559-c1202864eb05?q=80&w=800',
     },
     {
       title: 'Silo de Grãos Automatizado - Mato Grosso',
@@ -66,25 +66,25 @@ async function main() {
       title: 'Filtro de Mangas para Mineração',
       description: 'Solução de engenharia ambiental para controle de particulados em áreas críticas.',
       status: ProjectStatus.COMPLETED,
-      imageUrl: 'https://images.unsplash.com/photo-1535551951406-a199ec026e7a?q=80&w=800',
+      imageUrl: 'https://images.unsplash.com/photo-1496247749665-49cf5b1022e9?q=80&w=800',
     },
     {
       title: 'Painéis de Automação Industrial',
       description: 'Desenvolvimento de tecnologia para controle modular de fluxos de líquidos e sólidos.',
       status: ProjectStatus.PLANNING,
-      imageUrl: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc48?q=80&w=800',
+      imageUrl: 'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=800',
     },
     {
       title: 'Reforma de Silos Marítimos',
       description: 'Manutenção estrutural e tecnológica em terminais portuários de grande porte.',
       status: ProjectStatus.CANCELED,
-      imageUrl: 'https://images.unsplash.com/photo-1590496793907-422cc47726e6?q=80&w=800',
+      imageUrl: 'https://images.unsplash.com/photo-1496247749665-49cf5b1022e9?q=80&w=800',
     },
     {
       title: 'Sistema de Pesagem em Fluxo',
       description: 'Balanças integradas às correias transportadoras para controle preciso de inventário.',
       status: ProjectStatus.COMPLETED,
-      imageUrl: 'https://images.unsplash.com/photo-1517420162741-24823930ee45?q=80&w=800',
+      imageUrl: 'https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?q=80&w=800',
     },
   ]
 
