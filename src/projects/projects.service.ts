@@ -1,9 +1,44 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service'
 
 @Injectable()
 export class ProjectsService {
   constructor(private readonly prisma: PrismaService) {}
+
+  async findProjectById(id: string) {
+    try {
+      const project = await this.prisma.project.findUnique({
+        where: { id },
+        include: {
+          users: {
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  name: true,
+                  email: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      if (!project) {
+        throw new NotFoundException(`Projeto com ID ${id} não encontrado`);
+      }
+
+      return {
+        ...project,
+        users: project.users.map(pu => pu.user),
+      };
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new InternalServerErrorException('Erro ao buscar detalhes do projeto');
+    }
+  }
 
   async findAllProjects(page: number = 1) {
     try {

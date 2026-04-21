@@ -2,6 +2,7 @@ import { PrismaClient, ProjectStatus } from '@prisma/client'
 import { Pool } from 'pg'
 import { PrismaPg } from '@prisma/adapter-pg'
 import * as dotenv from 'dotenv'
+import * as bcrypt from 'bcrypt'
 
 dotenv.config()
 
@@ -10,98 +11,113 @@ const adapter = new PrismaPg(pool)
 const prisma = new PrismaClient({ adapter })
 
 async function main() {
-  console.log('Iniciando o seed de projetos...')
+  console.log('\nIniciando o script de seed para i9 TMG...\n')
 
-  const projects = [
-    {
-      title: 'Sistema de Correias Transportadoras - Porto Sul',
-      description: 'Engenharia e montagem de sistema modular para transporte de minério de ferro com capacidade de 2000t/h.',
-      status: ProjectStatus.COMPLETED,
-      imageUrl: 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=800',
+  console.log('🧹 Limpando banco de dados...')
+  await prisma.document.deleteMany()
+  await prisma.projectUser.deleteMany()
+  await prisma.project.deleteMany()
+  await prisma.user.deleteMany()
+  console.log('✔️ Banco de dados limpo com sucesso.\n')
+
+  console.log('👷 Criando membros da equipe (Usuários)...')
+  const hashedPassword = await bcrypt.hash('senha123', 10)
+
+  const user1 = await prisma.user.create({
+    data: {
+      name: 'Carlos Almeida - Engenheiro Civil',
+      email: 'carlos.almeida@i9tmg.com.br',
+      password: hashedPassword,
     },
-    {
-      title: 'Terminal de Armazenamento de Combustíveis',
-      description: 'Projeto de tanques verticais e tubulações para manuseio de líquidos inflamáveis em parque industrial.',
+  })
+
+  const user2 = await prisma.user.create({
+    data: {
+      name: 'Mariana Costa - Técnica de Segurança',
+      email: 'mariana.costa@i9tmg.com.br',
+      password: hashedPassword,
+    },
+  })
+
+  const user3 = await prisma.user.create({
+    data: {
+      name: 'Roberto Fernandes - Montador',
+      email: 'roberto.fernandes@i9tmg.com.br',
+      password: hashedPassword,
+    },
+  })
+  console.log(`✔️ 3 usuários criados com sucesso.\n`)
+
+  console.log('📄 Criando documentos e vinculando aos usuários...')
+  await prisma.document.createMany({
+    data: [
+      {
+        name: 'Certificado NR-35 (Trabalho em Altura)',
+        fileUrl: 'https://ixkwnjzznxsz.supabase.co/storage/v1/object/public/documents/nr35-carlos.pdf',
+        userId: user1.id,
+      },
+      {
+        name: 'Atestado de Saúde Ocupacional (ASO)',
+        fileUrl: 'https://ixkwnjzznxsz.supabase.co/storage/v1/object/public/documents/aso-mariana.pdf',
+        userId: user2.id,
+      },
+      {
+        name: 'Treinamento de Integração',
+        fileUrl: 'https://ixkwnjzznxsz.supabase.co/storage/v1/object/public/documents/integracao-roberto.pdf',
+        userId: user3.id,
+      },
+    ],
+  })
+  console.log('✔️ Documentos criados e vinculados.\n')
+
+  console.log('🏗️ Criando projetos industriais e vinculando a equipe...')
+
+  const proj1 = await prisma.project.create({
+    data: {
+      title: 'Montagem de Linha de Ensaque',
+      description: 'Projeto de instalação e montagem completa de equipamentos para nova linha de ensaque automatizada.',
+      clientName: 'Indústria Química Beta',
       status: ProjectStatus.IN_PROGRESS,
-      imageUrl: 'https://images.unsplash.com/photo-1513828583688-c52646db42da?q=80&w=800',
-    },
-    {
-      title: 'Moega Modular para Fertilizantes',
-      description: 'Solução personalizada para recepção de fertilizantes granulados com sistema de despoeiramento integrado.',
-      status: ProjectStatus.PLANNING,
-      imageUrl: 'https://images.unsplash.com/photo-1580982327559-c1202864eb05?q=80&w=800',
-    },
-    {
-      title: 'Silo de Grãos Automatizado - Mato Grosso',
-      description: 'Desenvolvimento de silos de 50.000 sacas com monitoramento térmico e tecnologia de aeração avançada.',
-      status: ProjectStatus.COMPLETED,
-      imageUrl: 'https://images.unsplash.com/photo-1523348837708-15d4a09cfac2?q=80&w=800',
-    },
-    {
-      title: 'Linha de Beneficiamento de Cimento',
-      description: 'Reforma e modernização da linha de britagem e ensaque de cimento para aumento de eficiência produtiva.',
-      status: ProjectStatus.IN_PROGRESS,
+      startDate: new Date('2026-01-10'),
+      endDate: new Date('2026-06-20'),
       imageUrl: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=800',
+      users: {
+        create: [
+          { userId: user1.id }, // Vincula Engenheiro
+          { userId: user3.id }, // Vincula Montador
+        ],
+      },
     },
-    {
-      title: 'Terminal Químico de Óleos Vegetais',
-      description: 'Implantação de sistema de bombeamento e filtragem para manuseio de óleos vegetais destinados à exportação.',
-      status: ProjectStatus.PLANNING,
-      imageUrl: 'https://images.unsplash.com/photo-1518623489648-a173ef7824f3?q=80&w=800',
-    },
-    // Adicionando mais alguns para testar a paginação (total > 9)
-    {
-      title: 'Elevador de Caçambas Industrial',
-      description: 'Equipamento robusto para transporte vertical de sólidos de alta densidade.',
-      status: ProjectStatus.COMPLETED,
-      imageUrl: 'https://images.unsplash.com/photo-1565008447742-97f6f38c985c?q=80&w=800',
-    },
-    {
-      title: 'Plataforma de Descarga de Caminhões',
-      description: 'Sistema hidráulico de tombamento para rápida descarga de granéis sólidos.',
-      status: ProjectStatus.IN_PROGRESS,
-      imageUrl: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=800',
-    },
-    {
-      title: 'Filtro de Mangas para Mineração',
-      description: 'Solução de engenharia ambiental para controle de particulados em áreas críticas.',
-      status: ProjectStatus.COMPLETED,
-      imageUrl: 'https://images.unsplash.com/photo-1496247749665-49cf5b1022e9?q=80&w=800',
-    },
-    {
-      title: 'Painéis de Automação Industrial',
-      description: 'Desenvolvimento de tecnologia para controle modular de fluxos de líquidos e sólidos.',
-      status: ProjectStatus.PLANNING,
-      imageUrl: 'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=800',
-    },
-    {
-      title: 'Reforma de Silos Marítimos',
-      description: 'Manutenção estrutural e tecnológica em terminais portuários de grande porte.',
-      status: ProjectStatus.CANCELED,
-      imageUrl: 'https://images.unsplash.com/photo-1496247749665-49cf5b1022e9?q=80&w=800',
-    },
-    {
-      title: 'Sistema de Pesagem em Fluxo',
-      description: 'Balanças integradas às correias transportadoras para controle preciso de inventário.',
-      status: ProjectStatus.COMPLETED,
-      imageUrl: 'https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?q=80&w=800',
-    },
-  ]
+  })
 
-  for (const project of projects) {
-    await prisma.project.create({
-      data: project,
-    })
-  }
+  const proj2 = await prisma.project.create({
+    data: {
+      title: 'Manutenção de Tanques de Combustível',
+      description: 'Parada programada para manutenção preventiva e corretiva nos tanques de armazenamento de diesel.',
+      clientName: 'Refinaria PetroMax',
+      status: ProjectStatus.PLANNING,
+      startDate: new Date('2026-05-01'),
+      endDate: new Date('2026-08-15'),
+      imageUrl: 'https://images.unsplash.com/photo-1513828583688-c52646db42da?q=80&w=800',
+      users: {
+        create: [
+          { userId: user1.id }, // Vincula Engenheiro
+          { userId: user2.id }, // Vincula Técnica de Segurança
+        ],
+      },
+    },
+  })
 
-  console.log('Seed finalizado com sucesso!')
+  console.log(`✔️ Projetos criados ("${proj1.title}" e "${proj2.title}"). Vinculados na tabela pivô.\n`)
+  console.log('✅ Seed concluído! O banco de dados da i9 TMG está pronto para testes e simulações.')
 }
 
 main()
   .catch((e) => {
-    console.error(e)
+    console.error('❌ Erro crítico durante a execução do seed:', e)
     process.exit(1)
   })
   .finally(async () => {
+    console.log('🔌 Desconectando do banco de dados...')
     await prisma.$disconnect()
   })
