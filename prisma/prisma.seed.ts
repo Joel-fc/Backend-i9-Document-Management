@@ -12,8 +12,10 @@ const prisma = new PrismaClient({ adapter })
 
 async function main() {
   await prisma.document.deleteMany()
+  await prisma.projectEmployee.deleteMany()
   await prisma.projectUser.deleteMany()
   await prisma.project.deleteMany()
+  await prisma.employee.deleteMany()
   await prisma.user.deleteMany()
 
   const hashedPassword = await bcrypt.hash('senha123', 10)
@@ -112,6 +114,17 @@ async function main() {
         ],
       },
     },
+  })
+
+  // Criar funcionários fictícios
+  await prisma.employee.createMany({
+    data: [
+      { name: 'João Silva', role: 'Soldador' },
+      { name: 'Ana Paula', role: 'Inspetora de Qualidade' },
+      { name: 'Lucas Mendes', role: 'Eletricista' },
+      { name: 'Fernando Souza', role: 'Ajudante Geral' },
+      { name: 'Camila Rocha', role: 'Segurança do Trabalho' },
+    ]
   })
 }
 

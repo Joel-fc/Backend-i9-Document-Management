@@ -15,6 +15,7 @@ model User {
 
   projects  ProjectUser[]
   documents Document[]
+  employee  Employee?
 }
 
 model Project {
@@ -30,7 +31,8 @@ model Project {
   clientName  String?
   projectUrl  String?
 
-  users ProjectUser[]
+  users     ProjectUser[]
+  employees ProjectEmployee[]
 }
 
 model ProjectUser {
@@ -60,4 +62,28 @@ enum ProjectStatus {
   IN_PROGRESS // Em execução
   COMPLETED // Finalizado
   CANCELED // Cancelado
+}
+
+model Employee {
+  id        String   @id @default(uuid())
+  name      String
+  role      String
+  userId    Int?     @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user     User?             @relation(fields: [userId], references: [id], onDelete: SetNull)
+  projects ProjectEmployee[]
+}
+
+model ProjectEmployee {
+  id         String   @id @default(uuid())
+  projectId  String
+  employeeId String
+  createdAt  DateTime @default(now())
+
+  project  Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, employeeId])
 }
