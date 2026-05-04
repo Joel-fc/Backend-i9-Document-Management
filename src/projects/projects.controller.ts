@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Body, Query, UseGuards } from '@nestjs/common';
+import { Controller, Post, Get, Body, Query, Param, UseGuards, ParseUUIDPipe } from '@nestjs/common';
 import { ProjectsService } from './projects.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
@@ -11,5 +11,11 @@ export class ProjectsController {
     async findAll(@Query('page') page: string) {
         const pageNumber = parseInt(page) || 1;
         return this.projectsService.findAllProjects(pageNumber);
+    }
+
+    @Get(':id')
+    @UseGuards(JwtAuthGuard)
+    async findOne(@Param('id', ParseUUIDPipe) id: string) {
+        return this.projectsService.findProjectById(id);
     }
 }
