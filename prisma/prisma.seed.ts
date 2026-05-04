@@ -11,16 +11,11 @@ const adapter = new PrismaPg(pool)
 const prisma = new PrismaClient({ adapter })
 
 async function main() {
-  console.log('\nIniciando o script de seed para i9 TMG...\n')
-
-  console.log('🧹 Limpando banco de dados...')
   await prisma.document.deleteMany()
   await prisma.projectUser.deleteMany()
   await prisma.project.deleteMany()
   await prisma.user.deleteMany()
-  console.log('✔️ Banco de dados limpo com sucesso.\n')
 
-  console.log('👷 Criando membros da equipe (Usuários)...')
   const hashedPassword = await bcrypt.hash('senha123', 10)
 
   const user1 = await prisma.user.create({
@@ -46,9 +41,7 @@ async function main() {
       password: hashedPassword,
     },
   })
-  console.log(`✔️ 3 usuários criados com sucesso.\n`)
 
-  console.log('📄 Criando documentos e vinculando aos usuários...')
   await prisma.document.createMany({
     data: [
       {
@@ -66,11 +59,24 @@ async function main() {
         fileUrl: 'https://ixkwnjzznxsz.supabase.co/storage/v1/object/public/documents/integracao-roberto.pdf',
         userId: user3.id,
       },
+      // 20 Documentos Fictícios extras para testes
+      ...Array.from({ length: 10 }).map((_, i) => ({
+        name: `Relatório de Inspeção Mensal #${i + 1}`,
+        fileUrl: `https://ixkwnjzznxsz.supabase.co/storage/v1/object/public/documents/relatorio-carlos-${i}.pdf`,
+        userId: user1.id,
+      })),
+      ...Array.from({ length: 5 }).map((_, i) => ({
+        name: `Análise de Risco de Ambiente #${i + 1}`,
+        fileUrl: `https://ixkwnjzznxsz.supabase.co/storage/v1/object/public/documents/risco-mariana-${i}.pdf`,
+        userId: user2.id,
+      })),
+      ...Array.from({ length: 5 }).map((_, i) => ({
+        name: `Certificado de Calibração de Equipamento #${i + 1}`,
+        fileUrl: `https://ixkwnjzznxsz.supabase.co/storage/v1/object/public/documents/calibracao-roberto-${i}.pdf`,
+        userId: user3.id,
+      })),
     ],
   })
-  console.log('✔️ Documentos criados e vinculados.\n')
-
-  console.log('🏗️ Criando projetos industriais e vinculando a equipe...')
 
   const proj1 = await prisma.project.create({
     data: {
@@ -107,17 +113,13 @@ async function main() {
       },
     },
   })
-
-  console.log(`✔️ Projetos criados ("${proj1.title}" e "${proj2.title}"). Vinculados na tabela pivô.\n`)
-  console.log('✅ Seed concluído! O banco de dados da i9 TMG está pronto para testes e simulações.')
 }
 
 main()
   .catch((e) => {
-    console.error('❌ Erro crítico durante a execução do seed:', e)
+    console.error('Erro crítico durante a execução do seed:', e)
     process.exit(1)
   })
   .finally(async () => {
-    console.log('🔌 Desconectando do banco de dados...')
     await prisma.$disconnect()
   })

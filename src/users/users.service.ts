@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException, InternalServerErrorException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
+import { CreateDocumentDto } from './dto/create-document.dto';
 
 @Injectable()
 export class UsersService {
@@ -36,4 +37,29 @@ export class UsersService {
       throw new InternalServerErrorException('Erro ao buscar documentos do usuário');
     }
   }
+
+  async createDocument(userId: number, dto: CreateDocumentDto) {
+    const userExists = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!userExists) {
+      throw new NotFoundException(`Usuário não encontrado`);
+    }
+
+    try {
+      const document = await this.prisma.document.create({
+        data: {
+          name: dto.name,
+          fileUrl: dto.fileUrl,
+          user: { connect: { id: userId } },
+        },
+      });
+
+      return document;
+    } catch (error) {
+      throw new InternalServerErrorException('Erro ao criar o documento');
+    }
+  }
 }
+
