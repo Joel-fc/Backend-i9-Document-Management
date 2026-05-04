@@ -12,8 +12,10 @@ const prisma = new PrismaClient({ adapter })
 
 async function main() {
   await prisma.document.deleteMany()
+  await prisma.projectEmployee.deleteMany()
   await prisma.projectUser.deleteMany()
   await prisma.project.deleteMany()
+  await prisma.employee.deleteMany()
   await prisma.user.deleteMany()
 
   const hashedPassword = await bcrypt.hash('senha123', 10)
@@ -42,41 +44,7 @@ async function main() {
     },
   })
 
-  await prisma.document.createMany({
-    data: [
-      {
-        name: 'Certificado NR-35 (Trabalho em Altura)',
-        fileUrl: 'https://ixkwnjzznxsz.supabase.co/storage/v1/object/public/documents/nr35-carlos.pdf',
-        userId: user1.id,
-      },
-      {
-        name: 'Atestado de Saúde Ocupacional (ASO)',
-        fileUrl: 'https://ixkwnjzznxsz.supabase.co/storage/v1/object/public/documents/aso-mariana.pdf',
-        userId: user2.id,
-      },
-      {
-        name: 'Treinamento de Integração',
-        fileUrl: 'https://ixkwnjzznxsz.supabase.co/storage/v1/object/public/documents/integracao-roberto.pdf',
-        userId: user3.id,
-      },
-      // 20 Documentos Fictícios extras para testes
-      ...Array.from({ length: 10 }).map((_, i) => ({
-        name: `Relatório de Inspeção Mensal #${i + 1}`,
-        fileUrl: `https://ixkwnjzznxsz.supabase.co/storage/v1/object/public/documents/relatorio-carlos-${i}.pdf`,
-        userId: user1.id,
-      })),
-      ...Array.from({ length: 5 }).map((_, i) => ({
-        name: `Análise de Risco de Ambiente #${i + 1}`,
-        fileUrl: `https://ixkwnjzznxsz.supabase.co/storage/v1/object/public/documents/risco-mariana-${i}.pdf`,
-        userId: user2.id,
-      })),
-      ...Array.from({ length: 5 }).map((_, i) => ({
-        name: `Certificado de Calibração de Equipamento #${i + 1}`,
-        fileUrl: `https://ixkwnjzznxsz.supabase.co/storage/v1/object/public/documents/calibracao-roberto-${i}.pdf`,
-        userId: user3.id,
-      })),
-    ],
-  })
+  
 
   const proj1 = await prisma.project.create({
     data: {
@@ -112,6 +80,17 @@ async function main() {
         ],
       },
     },
+  })
+
+  // Criar funcionários fictícios
+  await prisma.employee.createMany({
+    data: [
+      { name: 'João Silva', role: 'Soldador' },
+      { name: 'Ana Paula', role: 'Inspetora de Qualidade' },
+      { name: 'Lucas Mendes', role: 'Eletricista' },
+      { name: 'Fernando Souza', role: 'Ajudante Geral' },
+      { name: 'Camila Rocha', role: 'Segurança do Trabalho' },
+    ]
   })
 }
 
