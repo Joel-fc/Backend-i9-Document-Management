@@ -13,9 +13,8 @@ model User {
   name     String?
   password String // Aqui ficará o hash (criptografia) depois
 
-  projects  ProjectUser[]
-  documents Document[]
-  employee  Employee?
+  projects ProjectUser[]
+  employee Employee?
 }
 
 model Project {
@@ -48,13 +47,13 @@ model ProjectUser {
 }
 
 model Document {
-  id        String   @id @default(uuid())
-  name      String
-  fileUrl   String
-  userId    Int
-  createdAt DateTime @default(now())
+  id         String   @id @default(uuid())
+  name       String
+  fileUrl    String
+  employeeId String
+  createdAt  DateTime @default(now())
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
 }
 
 enum ProjectStatus {
@@ -72,8 +71,9 @@ model Employee {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user     User?             @relation(fields: [userId], references: [id], onDelete: SetNull)
-  projects ProjectEmployee[]
+  user      User?             @relation(fields: [userId], references: [id], onDelete: SetNull)
+  projects  ProjectEmployee[]
+  documents Document[]
 }
 
 model ProjectEmployee {
